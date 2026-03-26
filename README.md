@@ -40,7 +40,7 @@ You could use other workload by changing the list on this python script.
 
 After generating the input shapes, running the command below will print out the results on /results directory.
 ```
-export TT_METAL_HOME="$HOME/SwiftNPU/tt-metal" // Directory of SwiftNPU/tt-metal
+export TT_METAL_HOME="$HOME/SwiftNPU/tt-metal" # Directory of SwiftNPU/tt-metal
 env TT_METAL_HOME="$TT_METAL_HOME" make run_SwiftNPU
 ```
 Default algorithm for this run is First-Fit.
