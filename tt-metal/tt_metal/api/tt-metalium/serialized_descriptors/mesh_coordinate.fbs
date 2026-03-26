@@ -1,8 +1,0 @@
-namespace tt.tt_metal.distributed.flatbuffer;
-
-table MeshCoordinate {
-    // The coordinate values in each dimension
-    values:[uint32];
-}
-
-root_type MeshCoordinate;

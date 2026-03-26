@@ -1,5 +1,0 @@
-Profiler
-========
-
-.. toctree::
-  ReadMeshDeviceProfilerResults
