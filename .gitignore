@@ -1,0 +1,7 @@
+build/
+.cpmcache/
+/results/
+/results_old/
+.venv/
+/algorithm_test/build
+/algorithm_test/results

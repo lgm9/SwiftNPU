@@ -1,0 +1,4 @@
+[submodule "tt-metal"]
+	path = tt-metal
+	url = git@github.com:lgm9/tt-metal.git
+	branch = SwiftNPU
