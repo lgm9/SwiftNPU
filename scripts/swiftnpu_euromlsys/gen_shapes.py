@@ -5,10 +5,7 @@ OUT_FILE = Path("results/shapes.txt")
 OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
 
 # Format:
-#   0 N M K c     -> matmul: (N x M) @ (M x K), scheduled on c cores
-#   1 N K c       -> softmax on (N x K), scheduled on c cores
-#
-# Current sizes are matmul workloads.
+#   N M K c     -> matmul: (N x M) @ (M x K), scheduled on c cores
 
 # BERT
 # sizes = [
