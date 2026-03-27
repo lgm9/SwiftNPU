@@ -1,6 +1,8 @@
 # SwiftNPU
 Source Code for "SwiftNPU: Scalable Shape-Flexible Allocation for Inter-Core Connected NPUs" (EuroMLsys '26)
 
+This code is based on Tenstorrent Blackhole p150a device, but is easily adaptable to other Tenstorrent devices.
+
 ## Setup
 First, init the submodule & build tt-metal 
 ```bash
