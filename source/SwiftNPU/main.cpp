@@ -413,11 +413,7 @@ static void scheduler_execute_once(
             act_kind);
     }
 
-    // Single measured execution
-    unsigned int aux = 0;
-    uint64_t t0 = 0, t1 = 0;
-
-    t0 = __rdtscp(&aux);
+    // Warmup once, then run 25 measured iterations and report the average.
     for (int i = 0; i < T; i++) {
         TT_ASSERT(src0_buffers[i]->size() <= a_tiled[i].size() * sizeof(bfloat16), "A host tiled too small");
         TT_ASSERT(src1_buffers[i]->size() <= b_tiled[i].size() * sizeof(bfloat16), "B host tiled too small");
@@ -425,23 +421,52 @@ static void scheduler_execute_once(
         EnqueueWriteBuffer(cq, src1_buffers[i], b_tiled[i].data(), false);
     }
     Finish(cq);
-    t1 = __rdtscp(&aux);
-    uint64_t write_cycles = t1 - t0;
-
-    t0 = __rdtscp(&aux);
     EnqueueProgram(cq, program, true);
     Finish(cq);
-    t1 = __rdtscp(&aux);
-    uint64_t exec_cycles = t1 - t0;
-
-    t0 = __rdtscp(&aux);
     for (int i = 0; i < T; i++) {
         TT_ASSERT(dst_buffers[i]->size() <= out_tiled[i].size() * sizeof(bfloat16), "OUT host tiled too small");
         EnqueueReadBuffer(cq, dst_buffers[i], out_tiled[i].data(), false);
     }
     Finish(cq);
-    t1 = __rdtscp(&aux);
-    uint64_t read_cycles = t1 - t0;
+
+    constexpr uint32_t NUM_ITER = 25;
+    unsigned int aux = 0;
+    uint64_t t0 = 0, t1 = 0;
+    uint64_t write_sum = 0;
+    uint64_t exec_sum = 0;
+    uint64_t read_sum = 0;
+
+    for (uint32_t it = 0; it < NUM_ITER; ++it) {
+        t0 = __rdtscp(&aux);
+        for (int i = 0; i < T; i++) {
+            TT_ASSERT(src0_buffers[i]->size() <= a_tiled[i].size() * sizeof(bfloat16), "A host tiled too small");
+            TT_ASSERT(src1_buffers[i]->size() <= b_tiled[i].size() * sizeof(bfloat16), "B host tiled too small");
+            EnqueueWriteBuffer(cq, src0_buffers[i], a_tiled[i].data(), false);
+            EnqueueWriteBuffer(cq, src1_buffers[i], b_tiled[i].data(), false);
+        }
+        Finish(cq);
+        t1 = __rdtscp(&aux);
+        write_sum += (t1 - t0);
+
+        t0 = __rdtscp(&aux);
+        EnqueueProgram(cq, program, true);
+        Finish(cq);
+        t1 = __rdtscp(&aux);
+        exec_sum += (t1 - t0);
+
+        t0 = __rdtscp(&aux);
+        for (int i = 0; i < T; i++) {
+            TT_ASSERT(dst_buffers[i]->size() <= out_tiled[i].size() * sizeof(bfloat16), "OUT host tiled too small");
+            EnqueueReadBuffer(cq, dst_buffers[i], out_tiled[i].data(), false);
+        }
+        Finish(cq);
+        t1 = __rdtscp(&aux);
+        read_sum += (t1 - t0);
+    }
+
+    uint64_t write_cycles = write_sum / NUM_ITER;
+    uint64_t exec_cycles = exec_sum / NUM_ITER;
+    uint64_t read_cycles = read_sum / NUM_ITER;
 
     if (debug_option) {
         for (int i = 0; i < T; i++) {
