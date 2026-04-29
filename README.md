@@ -1,5 +1,6 @@
 # SwiftNPU
 Source Code for "SwiftNPU: Scalable Shape-Flexible Allocation for Inter-Core Connected NPUs" (EuroMLsys '26)
+[Paper link](https://dl.acm.org/doi/10.1145/3805621.3807614)
 
 This code is based on Tenstorrent Blackhole p150a device, but is easily adaptable to other Tenstorrent devices.
 
